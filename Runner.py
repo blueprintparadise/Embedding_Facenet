@@ -13,6 +13,7 @@ import cv2
 from tqdm import tqdm
 global offset
 offset = False
+import cv2
 import os
 import pandas as pd
 import threading
@@ -50,95 +51,17 @@ detector_backend = 'opencv'
 # distance_metric - used to judge distance between video_feed and database image
 distance_metric = 'cosine'
 input_shape = (224, 224)
+@app.route("/videoinput",methods = ["GET"])
+def video_to_image(videoinput):
+    vidcap = cv2.VideoCapture(videoinput)
+    success, image = vidcap.read()
+    count = 0
+    while success:
+        cv2.imwrite(r"C:\Users\rhira\OneDrive\Documents\FINAL_FACENET\Face_Recognition_GAIS\Face_Recog\images\frame%d.jpg" % count, image)  # save frame as JPEG file
+        success, image = vidcap.read()
+        print('Read a new frame: ', success)
+        count += 1
 
-@app.route("/Facevideo",methods=['GET','POST'])
-def Facevideo():
-    # cam = cv2.VideoCapture(0)
-    #
-    # try:
-    #
-    #     # creating a folder named data
-    #     if not os.path.exists('data'):
-    #         os.makedirs('data')
-    #
-    # # if not created then raise error
-    # except OSError:
-    #     print('Error: Creating directory of data')
-    #
-    # # frame
-    # currentframe = 0
-    #
-    # while (True):
-    #
-    #     # reading from frame
-    #     ret, frame = cam.read()
-    #
-    #     if ret:
-    #         # if video is still left continue creating images
-    #         name = './data/frame' + str(currentframe) + '.jpg'
-    #         print('Creating...' + name)
-    #
-    #         # writing the extracted images
-    #         cv2.imwrite(name, frame)
-    #
-    #         # increasing counter so that it will
-    #         # show how many frames are created
-    #         currentframe += 1
-    #     else:
-    #         break
-    response = requests.Response()
-    print(response)
-    return "Runing"
-# Embedding Images to dataframe
-'''
-[1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi',
-1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi',
-1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Akshay', 1, 'Akshay', 1, 'Akshay', 1, 'Akshay', 1, 'Akshay', 1,
-'Rushi', 1, 'Rushi', 1, 'Akshay', 1, 'Rushi', 1, 'Rushi', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi',
-'Akshay', 2, 'Rushi', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 2, 'Rushi', 'Akshay', 3,
-'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay',
-'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi',
-'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3,
-'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi',
-'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay',
-2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2,
-'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi',
-'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3,
-'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay',
-'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 2, 'Rushi',
-'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Pranay', 'Akshay',
-2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Pranay', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2,
-'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi',
-'Akshay', 2, 'Rushi', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay',
-'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Pranay', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi',
-'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Pranay', 'Akshay', 'Akshay', 3, 'Pawan', 'Akshay', 'Akshay', 2,
-'Akshay', 'Akshay', 2, 'Akshay', 'Akshay', 2, 'Akshay', 'Akshay', 2, 'Akshay', 'Akshay', 3, 'Pawan', 'Akshay', 'Akshay',
-3, 'Akshay', 'Akshay', 'Akshay', 3, 'Pawan', 'Akshay', 'Akshay', 3]
-'''
-
-def notification_logic():
-    pass
-
-
-@app.route('/name',methods=["GET"])
-def get_name():
-    lst = []
-    string = ''
-    name = realtime.api_notification()
-    People_Count  = [i for i in name if type(i)==int]
-    num_of_people = People_Count[-2]
-    num_of_people = num_of_people*2
-    Names = [i for i in name if type(i) == str]
-    Names = Names[-num_of_people]
-    print(Names)
-    
-    #final_x = int(final_x*2)
-    #final_x_2= final_x_2[-final_x]
-    
-
-
-    return '01'
-@app.route('/embed', methods=["GET"])
 def embed(model_name, db_path, detector_backend, distance_metric):
     employees = []
     # check passed db folder exists
@@ -178,36 +101,19 @@ def embed(model_name, db_path, detector_backend, distance_metric):
     df['distance_metric'] = distance_metric
     # returns dataframe with employee, embedding and distance_metric information
     return df
-@app.route('/retrn', methods=["GET"])
-def retrn():
-    emb = embed(model_name, db_path, detector_backend, distance_metric)
-    lst = ''
-    for i in emb['embedding']:
-        lst = str(lst) + str(i)
-    return lst
-@app.route("/")
-def index():
-    # return the rendered template
-    return render_template("index.html")
-
-
-@app.route('/video')
-def video():
-    return Response(
-        realtime.analysis(db_path, detector_backend=detector_backend, df=df, model_name=model_name, time_threshold=1,
-                          frame_threshold=1,distance_metric="cosine"),
-        mimetype="multipart/x-mixed-replace; boundary=frame")
 
 
 if __name__ == '__main__':
     # start a thread that will perform web stream
     df = embed(model_name, db_path, detector_backend, distance_metric)
+    video_to_image()
+    #df.to_csv(r"C:\Users\rhira\PycharmProjects\Mediapipe_Embedding",index=False)
     t = threading.Thread()
     t.daemon = True
     print("System Running Succesfully")
-    t.start()
+    ##t.start()
     # start the flask app
-    app.jinja_env.cache = {}
+    #app.jinja_env.cache = {}
     app.run(host='0.0.0.0', port='7788',threaded=True, debug=False,
-            use_reloader=False,ssl_context='adhoc')
+           use_reloader=False,ssl_context='adhoc')
 
